@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import type { TSPSolution } from '../types/tsp';
 import { SolutionStatus } from '../types/tsp';
 
@@ -104,12 +104,6 @@ const SolutionDetails: React.FC<SolutionDetailsProps> = ({
   const formatDistance = (distance?: number) => {
     if (!distance) return 'N/A';
     return distance.toFixed(2);
-  };
-
-  const calculateDistance = (point1: { x: number; y: number }, point2: { x: number; y: number }) => {
-    const dx = point2.x - point1.x;
-    const dy = point2.y - point1.y;
-    return Math.sqrt(dx * dx + dy * dy);
   };
 
   // If showOnlyTables is true, only render the tables
@@ -231,10 +225,10 @@ const SolutionDetails: React.FC<SolutionDetailsProps> = ({
                             <td className="px-4 py-3 text-sm font-medium text-blue-600 border-r border-gray-100">
                               <div>
                                 <span className="font-semibold">{formatDistance(distance)}</span>
-                                {index === solution.route.length - 1 && (
+                                {solution?.route && index === solution.route.length - 1 && (
                                   <div className="text-xs text-gray-500 mt-1">→ Return to start</div>
                                 )}
-                                {index < solution.route.length - 1 && (
+                                {solution?.route && index < solution.route.length - 1 && (
                                   <div className="text-xs text-gray-500 mt-1">→ Point {index + 2}</div>
                                 )}
                               </div>
@@ -490,10 +484,10 @@ const SolutionDetails: React.FC<SolutionDetailsProps> = ({
                                 <td className="px-4 py-3 text-sm font-medium text-blue-600 border-r border-gray-100">
                                   <div>
                                     <span className="font-semibold">{formatDistance(distance)}</span>
-                                    {index === solution.route.length - 1 && (
+                                    {solution?.route && index === solution.route.length - 1 && (
                                       <div className="text-xs text-gray-500 mt-1">→ Return to start</div>
                                     )}
-                                    {index < solution.route.length - 1 && (
+                                    {solution?.route && index < solution.route.length - 1 && (
                                       <div className="text-xs text-gray-500 mt-1">→ Point {index + 2}</div>
                                     )}
                                   </div>
