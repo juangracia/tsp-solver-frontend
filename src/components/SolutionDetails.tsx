@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import type { TSPSolution } from '../types/tsp';
 import { SolutionStatus } from '../types/tsp';
 
@@ -7,6 +7,10 @@ interface SolutionDetailsProps {
   onSolve?: () => void;
   isSolving?: boolean;
   className?: string;
+  selectedOriginalPoint?: number | null;
+  selectedRoutePoint?: number | null;
+  onSelectOriginalPoint?: (index: number | null) => void;
+  onSelectRoutePoint?: (index: number | null) => void;
 }
 
 const SolutionDetails: React.FC<SolutionDetailsProps> = ({
@@ -14,6 +18,10 @@ const SolutionDetails: React.FC<SolutionDetailsProps> = ({
   onSolve,
   isSolving = false,
   className = '',
+  selectedOriginalPoint = null,
+  selectedRoutePoint = null,
+  onSelectOriginalPoint,
+  onSelectRoutePoint,
 }) => {
   // Log for debugging
   console.log('SolutionDetails rendering with solution:', solution);
@@ -92,6 +100,22 @@ const SolutionDetails: React.FC<SolutionDetailsProps> = ({
   const formatDistance = (distance?: number) => {
     if (!distance) return 'N/A';
     return distance.toFixed(2);
+  };
+
+  const calculateDistance = (point1: { x: number; y: number }, point2: { x: number; y: number }) => {
+    const dx = point2.x - point1.x;
+    const dy = point2.y - point1.y;
+    return Math.sqrt(dx * dx + dy * dy);
+  };
+
+  const getRouteDistances = (route: Array<{ x: number; y: number }>) => {
+    const distances = [];
+    for (let i = 0; i < route.length; i++) {
+      const current = route[i];
+      const next = route[(i + 1) % route.length];
+      distances.push(calculateDistance(current, next));
+    }
+    return distances;
   };
 
   return (
@@ -204,30 +228,139 @@ const SolutionDetails: React.FC<SolutionDetailsProps> = ({
             )}
           </div>
 
+          {/* Original Points Table */}
+          {solution.originalPoints && solution.originalPoints.length > 0 && (
+            <div className="pt-4 border-t">
+              <h4 className="font-medium text-gray-700 mb-3">Original Points (Upload Order)</h4>
+              <div className="max-h-48 overflow-y-auto border border-gray-200 rounded-lg">
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gradient-to-r from-gray-50 to-gray-100 sticky top-0">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-r border-gray-200">
+                          Point #
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-r border-gray-200">
+                          Coordinates
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                          Address
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-100">
+                      {solution.originalPoints.map((point, index) => (
+                        <tr 
+                          key={index} 
+                          className={`cursor-pointer transition-colors duration-150 hover:bg-blue-50 ${
+                            selectedOriginalPoint === index ? 'bg-blue-100 border-l-4 border-l-blue-500' : 
+                            index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
+                          }`}
+                          onClick={() => onSelectOriginalPoint?.(selectedOriginalPoint === index ? null : index)}
+                        >
+                          <td className="px-4 py-3 text-sm font-medium text-gray-900 border-r border-gray-100">
+                            {index + 1}
+                          </td>
+                          <td className="px-4 py-3 text-sm text-gray-700 font-mono border-r border-gray-100">
+                            ({point.x.toFixed(2)}, {point.y.toFixed(2)})
+                          </td>
+                          <td className="px-4 py-3 text-sm text-gray-700 max-w-xs truncate">
+                            {point.address || 'N/A'}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Route Information */}
           {solution.route && solution.route.length > 0 && (
             <div className="pt-4 border-t">
-              <h4 className="font-medium text-gray-700 mb-3">Route Order</h4>
-              <div className="max-h-40 overflow-y-auto">
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 text-sm">
-                  {solution.route.map((point, index) => (
-                    <div key={index} className="flex items-center gap-2 p-2 bg-gray-50 rounded">
-                      <div className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-medium">
-                        {index + 1}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        {point.address ? (
-                          <div className="truncate text-gray-700" title={point.address}>
-                            {point.address.split(',')[0]}
-                          </div>
-                        ) : (
-                          <div className="text-gray-700">
-                            ({point.x.toFixed(1)}, {point.y.toFixed(1)})
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))}
+              <h4 className="font-medium text-gray-700 mb-3">Optimized Route Details</h4>
+              <div className="max-h-60 overflow-y-auto border border-gray-200 rounded-lg">
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gradient-to-r from-blue-50 to-blue-100 sticky top-0">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-r border-gray-200">
+                          Original #
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-r border-gray-200">
+                          Route Order
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-r border-gray-200">
+                          Coordinates
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-r border-gray-200">
+                          Segment Distance
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                          Total Distance
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-100">
+                      {(() => {
+                        const routeDistances = getRouteDistances(solution.route);
+                        let cumulativeDistance = 0;
+                        
+                        return solution.route.map((point, index) => {
+                          const distance = routeDistances[index];
+                          cumulativeDistance += distance;
+                          
+                          // Find original index of this point
+                          const originalIndex = solution.originalPoints ? 
+                            solution.originalPoints.findIndex(op => 
+                              Math.abs(op.x - point.x) < 0.001 && Math.abs(op.y - point.y) < 0.001
+                            ) + 1 : 'N/A';
+
+                          return (
+                            <tr 
+                              key={index} 
+                              className={`cursor-pointer transition-colors duration-150 hover:bg-green-50 ${
+                                selectedRoutePoint === index ? 'bg-green-100 border-l-4 border-l-green-500' : 
+                                index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
+                              }`}
+                              onClick={() => onSelectRoutePoint?.(selectedRoutePoint === index ? null : index)}
+                            >
+                              <td className="px-4 py-3 text-sm font-medium text-gray-900 border-r border-gray-100">
+                                {originalIndex}
+                              </td>
+                              <td className="px-4 py-3 text-sm font-medium text-blue-600 border-r border-gray-100">
+                                <div className="flex items-center gap-2">
+                                  {index + 1}
+                                  {index === 0 && <span className="text-xs text-green-600 font-semibold">START</span>}
+                                </div>
+                              </td>
+                              <td className="px-4 py-3 text-sm text-gray-700 font-mono border-r border-gray-100">
+                                {point.address ? (
+                                  <div className="max-w-xs truncate" title={point.address}>
+                                    {point.address.split(',')[0]}
+                                  </div>
+                                ) : (
+                                  `(${point.x.toFixed(2)}, ${point.y.toFixed(2)})`
+                                )}
+                              </td>
+                              <td className="px-4 py-3 text-sm font-medium text-blue-600 border-r border-gray-100">
+                                <div>
+                                  {formatDistance(distance)}
+                                  {index === solution.route.length - 1 && (
+                                    <div className="text-xs text-gray-500 mt-1">Return to start</div>
+                                  )}
+                                </div>
+                              </td>
+                              <td className="px-4 py-3 text-sm font-semibold text-green-600">
+                                {formatDistance(cumulativeDistance)}
+                              </td>
+                            </tr>
+                          );
+                        });
+                      })()}
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </div>

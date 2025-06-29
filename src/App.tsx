@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import './App.css'
 import FileUpload from './components/FileUpload'
-import TSPVisualization from './components/TSPVisualization'
+import TSPVisualizationSVG from './components/TSPVisualizationSVG'
 import SolutionDetails from './components/SolutionDetails'
 import ThemeToggle from './components/ThemeToggle'
 import { TSPService } from './services/tspService'
@@ -13,6 +13,8 @@ function App() {
   const [isSolving, setIsSolving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [allSolutions, setAllSolutions] = useState<TSPSolution[]>([])
+  const [selectedOriginalPoint, setSelectedOriginalPoint] = useState<number | null>(null)
+  const [selectedRoutePoint, setSelectedRoutePoint] = useState<number | null>(null)
 
   useEffect(() => {
     // Load existing solutions on component mount
@@ -188,9 +190,11 @@ function App() {
                     <svg width="24" height="24" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#6366f1" opacity=".1"/><path stroke="#6366f1" strokeWidth="2" d="M5 12h14M12 5v14"/></svg>
                     Route Visualization
                   </h2>
-                  <TSPVisualization 
+                  <TSPVisualizationSVG 
                     solution={currentSolution}
                     showRoute={true}
+                    selectedOriginalPoint={selectedOriginalPoint}
+                    selectedRoutePoint={selectedRoutePoint}
                   />
                 </div>
                 <div className="card-modern">
@@ -202,6 +206,10 @@ function App() {
                     solution={currentSolution}
                     isSolving={isSolving}
                     onSolve={() => handleSolve(currentSolution.id)}
+                    selectedOriginalPoint={selectedOriginalPoint}
+                    selectedRoutePoint={selectedRoutePoint}
+                    onSelectOriginalPoint={setSelectedOriginalPoint}
+                    onSelectRoutePoint={setSelectedRoutePoint}
                   />
                 </div>
               </div>

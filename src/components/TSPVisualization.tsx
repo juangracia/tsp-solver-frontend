@@ -99,44 +99,80 @@ const TSPVisualization: React.FC<TSPVisualizationProps> = ({
 
       // Draw route lines if available and enabled
       if (showRoute && route && route.length > 1) {
+        const scaledRoute = route.map(scalePoint);
+        
+        // Function to draw arrow at the end of a line
+        const drawArrow = (fromX: number, fromY: number, toX: number, toY: number, size = 8) => {
+          const angle = Math.atan2(toY - fromY, toX - fromX);
+          const arrowLength = size;
+          const arrowAngle = Math.PI / 6; // 30 degrees
+          
+          // Calculate arrow points
+          const x1 = toX - arrowLength * Math.cos(angle - arrowAngle);
+          const y1 = toY - arrowLength * Math.sin(angle - arrowAngle);
+          const x2 = toX - arrowLength * Math.cos(angle + arrowAngle);
+          const y2 = toY - arrowLength * Math.sin(angle + arrowAngle);
+          
+          // Draw arrow
+          ctx.beginPath();
+          ctx.moveTo(toX, toY);
+          ctx.lineTo(x1, y1);
+          ctx.moveTo(toX, toY);
+          ctx.lineTo(x2, y2);
+          ctx.stroke();
+        };
+        
+        // Draw route lines with arrows and numbers
         ctx.strokeStyle = '#ef4444';
         ctx.lineWidth = 2;
         ctx.setLineDash([]);
         
-        ctx.beginPath();
-        const scaledRoute = route.map(scalePoint);
-        ctx.moveTo(scaledRoute[0].x, scaledRoute[0].y);
-        
-        for (let i = 1; i < scaledRoute.length; i++) {
-          ctx.lineTo(scaledRoute[i].x, scaledRoute[i].y);
-        }
-        
-        // Close the route (return to start)
-        if (scaledRoute.length > 0) {
-          ctx.lineTo(scaledRoute[0].x, scaledRoute[0].y);
-        }
-        
-        ctx.stroke();
-
-        // Draw route order numbers
-        ctx.fillStyle = '#ffffff';
-        ctx.font = '12px Arial';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        
-        route.forEach((point, index) => {
-          const scaled = scalePoint(point);
+        for (let i = 0; i < scaledRoute.length; i++) {
+          const current = scaledRoute[i];
+          const next = scaledRoute[(i + 1) % scaledRoute.length];
           
-          // Draw white circle background for number
+          // Draw line segment
           ctx.beginPath();
-          ctx.arc(scaled.x, scaled.y, 12, 0, 2 * Math.PI);
+          ctx.moveTo(current.x, current.y);
+          ctx.lineTo(next.x, next.y);
+          ctx.stroke();
+          
+          // Draw arrow on the line (positioned 80% along the line)
+          const arrowX = current.x + (next.x - current.x) * 0.8;
+          const arrowY = current.y + (next.y - current.y) * 0.8;
+          drawArrow(current.x, current.y, arrowX, arrowY);
+          
+          // Draw route order number on the line (positioned at midpoint)
+          const midX = current.x + (next.x - current.x) * 0.5;
+          const midY = current.y + (next.y - current.y) * 0.5;
+          
+          // Calculate offset perpendicular to the line for better visibility
+          const lineAngle = Math.atan2(next.y - current.y, next.x - current.x);
+          const perpAngle = lineAngle + Math.PI / 2;
+          const offsetDistance = 15;
+          const offsetX = Math.cos(perpAngle) * offsetDistance;
+          const offsetY = Math.sin(perpAngle) * offsetDistance;
+          
+          // Draw background circle for number
+          ctx.beginPath();
+          ctx.arc(midX + offsetX, midY + offsetY, 10, 0, 2 * Math.PI);
           ctx.fillStyle = '#ef4444';
           ctx.fill();
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 1;
+          ctx.stroke();
           
           // Draw order number
           ctx.fillStyle = '#ffffff';
-          ctx.fillText((index + 1).toString(), scaled.x, scaled.y);
-        });
+          ctx.font = 'bold 11px Arial';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText((i + 1).toString(), midX + offsetX, midY + offsetY);
+          
+          // Reset stroke style for next line
+          ctx.strokeStyle = '#ef4444';
+          ctx.lineWidth = 2;
+        }
       }
 
       // Draw points
@@ -157,6 +193,43 @@ const TSPVisualization: React.FC<TSPVisualizationProps> = ({
         ctx.strokeStyle = '#ffffff';
         ctx.lineWidth = 2;
         ctx.stroke();
+        
+        // Add "START" label to the first point
+        if (index === 0) {
+          ctx.fillStyle = '#22c55e';
+          ctx.font = 'bold 12px Arial';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'top';
+          
+          // Draw background rectangle for text
+          const text = 'START';
+          const textMetrics = ctx.measureText(text);
+          const textWidth = textMetrics.width;
+          const textHeight = 12;
+          const padding = 4;
+          
+          ctx.fillStyle = '#22c55e';
+          ctx.fillRect(
+            scaled.x - textWidth/2 - padding, 
+            scaled.y - 25 - textHeight - padding,
+            textWidth + 2 * padding,
+            textHeight + 2 * padding
+          );
+          
+          // Draw white border around text background
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 1;
+          ctx.strokeRect(
+            scaled.x - textWidth/2 - padding, 
+            scaled.y - 25 - textHeight - padding,
+            textWidth + 2 * padding,
+            textHeight + 2 * padding
+          );
+          
+          // Draw text
+          ctx.fillStyle = '#ffffff';
+          ctx.fillText(text, scaled.x, scaled.y - 25);
+        }
       });
 
       // Draw grid with theme-appropriate colors
