@@ -181,26 +181,15 @@ function App() {
             )}
           </div>
 
-          {/* Right column: Visualization + Details */}
+          {/* Right column: Side-by-side Tables and Visualization */}
           <div className="lg:col-span-2">
             {currentSolution && (
-              <div className="space-y-8">
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                {/* Left: Data Tables */}
                 <div className="card-modern">
-                  <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
-                    <svg width="24" height="24" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#6366f1" opacity=".1"/><path stroke="#6366f1" strokeWidth="2" d="M5 12h14M12 5v14"/></svg>
-                    Route Visualization
-                  </h2>
-                  <TSPVisualizationSVG 
-                    solution={currentSolution}
-                    showRoute={true}
-                    selectedOriginalPoint={selectedOriginalPoint}
-                    selectedRoutePoint={selectedRoutePoint}
-                  />
-                </div>
-                <div className="card-modern">
-                  <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
-                    <svg width="24" height="24" fill="none" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2" fill="#818cf8" opacity=".1"/><rect x="4" y="4" width="16" height="16" rx="2" stroke="#6366f1" strokeWidth="2"/><path stroke="#6366f1" strokeWidth="2" d="M8 8h8M8 12h8M8 16h4"/></svg>
-                    Solution Details
+                  <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                    <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" strokeWidth="2" d="M3 7h18M3 12h18M3 17h18"/></svg>
+                    Route Data
                   </h2>
                   <SolutionDetails 
                     solution={currentSolution}
@@ -210,6 +199,21 @@ function App() {
                     selectedRoutePoint={selectedRoutePoint}
                     onSelectOriginalPoint={setSelectedOriginalPoint}
                     onSelectRoutePoint={setSelectedRoutePoint}
+                    showOnlyTables={true}
+                  />
+                </div>
+
+                {/* Right: Visualization */}
+                <div className="card-modern">
+                  <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                    <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#6366f1" opacity=".1"/><path stroke="#6366f1" strokeWidth="2" d="M5 12h14M12 5v14"/></svg>
+                    Interactive Graph
+                  </h2>
+                  <TSPVisualizationSVG 
+                    solution={currentSolution}
+                    showRoute={true}
+                    selectedOriginalPoint={selectedOriginalPoint}
+                    selectedRoutePoint={selectedRoutePoint}
                   />
                 </div>
               </div>
