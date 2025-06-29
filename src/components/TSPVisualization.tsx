@@ -30,6 +30,24 @@ const TSPVisualization: React.FC<TSPVisualizationProps> = ({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Check if dark mode is enabled
+  const isDarkMode = () => document.documentElement.getAttribute('data-theme') === 'dark';
+  const [darkMode, setDarkMode] = useState(isDarkMode());
+  
+  // Listen for theme changes
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setDarkMode(isDarkMode());
+    });
+    
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme']
+    });
+    
+    return () => observer.disconnect();
+  }, []);
+
   useEffect(() => {
     try {
       const canvas = canvasRef.current;
@@ -42,8 +60,8 @@ const TSPVisualization: React.FC<TSPVisualizationProps> = ({
       canvas.width = dimensions.width;
       canvas.height = dimensions.height;
 
-      // Clear canvas
-      ctx.fillStyle = '#ffffff';
+      // Clear canvas with theme-appropriate background color
+      ctx.fillStyle = darkMode ? '#1e293b' : '#ffffff';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       // Add defensive checks for solution structure
@@ -141,8 +159,8 @@ const TSPVisualization: React.FC<TSPVisualizationProps> = ({
         ctx.stroke();
       });
 
-      // Draw grid
-      ctx.strokeStyle = '#f3f4f6';
+      // Draw grid with theme-appropriate colors
+      ctx.strokeStyle = darkMode ? '#334155' : '#f3f4f6';
       ctx.lineWidth = 1;
       ctx.setLineDash([2, 2]);
       
@@ -164,9 +182,9 @@ const TSPVisualization: React.FC<TSPVisualizationProps> = ({
         ctx.stroke();
       }
 
-      // Draw axis labels
+      // Draw axis labels with theme-appropriate colors
       ctx.setLineDash([]);
-      ctx.fillStyle = '#6b7280';
+      ctx.fillStyle = darkMode ? '#94a3b8' : '#6b7280';
       ctx.font = '12px Arial';
       ctx.textAlign = 'center';
       ctx.fillText('X Coordinate', canvas.width / 2, canvas.height - 10);
@@ -181,12 +199,12 @@ const TSPVisualization: React.FC<TSPVisualizationProps> = ({
       console.error('Error rendering TSP visualization:', error);
     }
 
-  }, [solution, showRoute, dimensions]);
+  }, [solution, showRoute, dimensions, darkMode]);
 
   if (!solution) {
     return (
-      <div className={`flex items-center justify-center bg-gray-50 rounded-lg ${className}`}>
-        <div className="text-center text-gray-500">
+      <div className={`flex items-center justify-center rounded-lg ${className}`} style={{ background: 'var(--color-bg-card-hover)' }}>
+        <div className="text-center" style={{ color: 'var(--color-text-secondary)' }}>
           <div className="text-4xl mb-4">🗺️</div>
           <div>Upload a file to see the visualization</div>
         </div>
@@ -195,23 +213,23 @@ const TSPVisualization: React.FC<TSPVisualizationProps> = ({
   }
 
   return (
-    <div className={`bg-white rounded-lg border shadow-sm ${className}`}>
-      <div className="p-4 border-b">
-        <h3 className="text-lg font-semibold text-gray-800">
+    <div className={`rounded-lg border shadow-sm ${className}`} style={{ background: 'var(--color-bg-card)' }}>
+      <div className="p-4 border-b" style={{ borderColor: 'var(--color-border)' }}>
+        <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>
           Route Visualization ({solution.pointCount} points)
         </h3>
         {solution.route && (
           <div className="flex items-center gap-4 mt-2">
-            <div className="flex items-center gap-2 text-sm text-gray-600">
+            <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--color-text-secondary)' }}>
               <div className="w-3 h-3 bg-green-500 rounded-full"></div>
               Start point
             </div>
-            <div className="flex items-center gap-2 text-sm text-gray-600">
+            <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--color-text-secondary)' }}>
               <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
               Other points
             </div>
             {showRoute && (
-              <div className="flex items-center gap-2 text-sm text-gray-600">
+              <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--color-text-secondary)' }}>
                 <div className="w-8 h-0.5 bg-red-500"></div>
                 Route
               </div>
@@ -223,8 +241,12 @@ const TSPVisualization: React.FC<TSPVisualizationProps> = ({
       <div className="p-4">
         <canvas
           ref={canvasRef}
-          className="border border-gray-200 rounded w-full"
-          style={{ maxWidth: '100%', height: 'auto' }}
+          className="border rounded w-full"
+          style={{ 
+            borderColor: 'var(--color-border)',
+            maxWidth: '100%', 
+            height: 'auto' 
+          }}
         />
       </div>
     </div>
