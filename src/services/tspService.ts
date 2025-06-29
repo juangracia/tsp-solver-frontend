@@ -2,7 +2,7 @@ import axios, { type AxiosResponse } from 'axios';
 import type { TSPSolution, SolveOptions, UploadResponse, SolutionsListResponse } from '../types/tsp';
 
 const API_BASE_URL = import.meta.env.PROD 
-  ? 'https://tsp-solver-backend.railway.app'
+  ? 'https://tsp-solver-backend-production.up.railway.app'
   : 'http://localhost:8080';
 
 const api = axios.create({
