@@ -15,12 +15,41 @@ const SolutionDetails: React.FC<SolutionDetailsProps> = ({
   isSolving = false,
   className = '',
 }) => {
+  // Log for debugging
+  console.log('SolutionDetails rendering with solution:', solution);
+  
+  // Handle null solution case
   if (!solution) {
     return (
       <div className={`bg-gray-50 rounded-lg p-6 ${className}`}>
         <div className="text-center text-gray-500">
           <div className="text-4xl mb-4">📊</div>
           <div>Upload a file to see solution details</div>
+        </div>
+      </div>
+    );
+  }
+
+  // Validate solution has required properties to avoid runtime errors
+  try {
+    if (!solution.id || !solution.status || !solution.pointCount) {
+      console.error('Invalid solution structure:', solution);
+      return (
+        <div className={`bg-red-50 rounded-lg p-6 ${className}`}>
+          <div className="text-center text-red-500">
+            <div className="text-4xl mb-4">⚠️</div>
+            <div>Error: Invalid solution data</div>
+          </div>
+        </div>
+      );
+    }
+  } catch (error) {
+    console.error('Error validating solution:', error);
+    return (
+      <div className={`bg-red-50 rounded-lg p-6 ${className}`}>
+        <div className="text-center text-red-500">
+          <div className="text-4xl mb-4">⚠️</div>
+          <div>Error processing solution data</div>
         </div>
       </div>
     );
@@ -158,7 +187,7 @@ const SolutionDetails: React.FC<SolutionDetailsProps> = ({
                     Solving...
                   </div>
                 ) : (
-                  'Solve TSP'
+                  'Solve Route'
                 )}
               </button>
             )}

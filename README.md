@@ -146,14 +146,14 @@ server: {
 
 1. Start the backend server (port 8080)
 2. Start the frontend dev server (port 3000)
-3. Upload test files from `/backend/postman_test_files/`
+3. Upload test files from `/tsp-solver-backend/postman_test_files/`
 4. Verify algorithm selection and visualization
 
 ### Test Files
 
 Sample coordinate files are available:
 - `/public/sample_points.txt` - 5 points for exact algorithm testing
-- Backend test files in `/backend/postman_test_files/`
+- Backend test files in `/tsp-solver-backend/postman_test_files/`
 
 ## Performance
 

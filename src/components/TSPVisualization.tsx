@@ -31,147 +31,155 @@ const TSPVisualization: React.FC<TSPVisualizationProps> = ({
   }, []);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas || !solution) return;
+    try {
+      const canvas = canvasRef.current;
+      if (!canvas || !solution) return;
 
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
 
-    // Set canvas size
-    canvas.width = dimensions.width;
-    canvas.height = dimensions.height;
+      // Set canvas size
+      canvas.width = dimensions.width;
+      canvas.height = dimensions.height;
 
-    // Clear canvas
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    const points = solution.originalPoints;
-    const route = solution.route;
-
-    if (points.length === 0) return;
-
-    // Calculate bounds for scaling
-    const xCoords = points.map(p => p.x);
-    const yCoords = points.map(p => p.y);
-    const minX = Math.min(...xCoords);
-    const maxX = Math.max(...xCoords);
-    const minY = Math.min(...yCoords);
-    const maxY = Math.max(...yCoords);
-
-    // Add padding
-    const padding = 40;
-    const rangeX = maxX - minX || 1;
-    const rangeY = maxY - minY || 1;
-    const scaleX = (canvas.width - 2 * padding) / rangeX;
-    const scaleY = (canvas.height - 2 * padding) / rangeY;
-    const scale = Math.min(scaleX, scaleY);
-
-    // Center the visualization
-    const offsetX = (canvas.width - rangeX * scale) / 2 - minX * scale;
-    const offsetY = (canvas.height - rangeY * scale) / 2 - minY * scale;
-
-    const scalePoint = (point: Point) => ({
-      x: point.x * scale + offsetX,
-      y: canvas.height - (point.y * scale + offsetY), // Flip Y axis
-    });
-
-    // Draw route lines if available and enabled
-    if (showRoute && route && route.length > 1) {
-      ctx.strokeStyle = '#ef4444';
-      ctx.lineWidth = 2;
-      ctx.setLineDash([]);
-      
-      ctx.beginPath();
-      const scaledRoute = route.map(scalePoint);
-      ctx.moveTo(scaledRoute[0].x, scaledRoute[0].y);
-      
-      for (let i = 1; i < scaledRoute.length; i++) {
-        ctx.lineTo(scaledRoute[i].x, scaledRoute[i].y);
-      }
-      
-      // Close the route (return to start)
-      if (scaledRoute.length > 0) {
-        ctx.lineTo(scaledRoute[0].x, scaledRoute[0].y);
-      }
-      
-      ctx.stroke();
-
-      // Draw route order numbers
+      // Clear canvas
       ctx.fillStyle = '#ffffff';
-      ctx.font = '12px Arial';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Add defensive checks for solution structure
+      const points = Array.isArray(solution.originalPoints) ? solution.originalPoints : [];
+      const route = Array.isArray(solution.route) ? solution.route : [];
       
-      route.forEach((point, index) => {
+      console.log('TSPVisualization rendering with points:', points.length, 'route:', route.length);
+
+      if (points.length === 0) return;
+
+      // Calculate bounds for scaling
+      const xCoords = points.map(p => p.x);
+      const yCoords = points.map(p => p.y);
+      const minX = Math.min(...xCoords);
+      const maxX = Math.max(...xCoords);
+      const minY = Math.min(...yCoords);
+      const maxY = Math.max(...yCoords);
+
+      // Add padding
+      const padding = 40;
+      const rangeX = maxX - minX || 1;
+      const rangeY = maxY - minY || 1;
+      const scaleX = (canvas.width - 2 * padding) / rangeX;
+      const scaleY = (canvas.height - 2 * padding) / rangeY;
+      const scale = Math.min(scaleX, scaleY);
+
+      // Center the visualization
+      const offsetX = (canvas.width - rangeX * scale) / 2 - minX * scale;
+      const offsetY = (canvas.height - rangeY * scale) / 2 - minY * scale;
+
+      const scalePoint = (point: Point) => ({
+        x: point.x * scale + offsetX,
+        y: canvas.height - (point.y * scale + offsetY), // Flip Y axis
+      });
+
+      // Draw route lines if available and enabled
+      if (showRoute && route && route.length > 1) {
+        ctx.strokeStyle = '#ef4444';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([]);
+        
+        ctx.beginPath();
+        const scaledRoute = route.map(scalePoint);
+        ctx.moveTo(scaledRoute[0].x, scaledRoute[0].y);
+        
+        for (let i = 1; i < scaledRoute.length; i++) {
+          ctx.lineTo(scaledRoute[i].x, scaledRoute[i].y);
+        }
+        
+        // Close the route (return to start)
+        if (scaledRoute.length > 0) {
+          ctx.lineTo(scaledRoute[0].x, scaledRoute[0].y);
+        }
+        
+        ctx.stroke();
+
+        // Draw route order numbers
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '12px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        
+        route.forEach((point, index) => {
+          const scaled = scalePoint(point);
+          
+          // Draw white circle background for number
+          ctx.beginPath();
+          ctx.arc(scaled.x, scaled.y, 12, 0, 2 * Math.PI);
+          ctx.fillStyle = '#ef4444';
+          ctx.fill();
+          
+          // Draw order number
+          ctx.fillStyle = '#ffffff';
+          ctx.fillText((index + 1).toString(), scaled.x, scaled.y);
+        });
+      }
+
+      // Draw points
+      points.forEach((point, index) => {
         const scaled = scalePoint(point);
         
-        // Draw white circle background for number
         ctx.beginPath();
-        ctx.arc(scaled.x, scaled.y, 12, 0, 2 * Math.PI);
-        ctx.fillStyle = '#ef4444';
-        ctx.fill();
+        ctx.arc(scaled.x, scaled.y, 6, 0, 2 * Math.PI);
         
-        // Draw order number
-        ctx.fillStyle = '#ffffff';
-        ctx.fillText((index + 1).toString(), scaled.x, scaled.y);
+        // Color coding: start point green, others blue
+        if (index === 0) {
+          ctx.fillStyle = '#22c55e';
+        } else {
+          ctx.fillStyle = '#3b82f6';
+        }
+        
+        ctx.fill();
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2;
+        ctx.stroke();
       });
-    }
 
-    // Draw points
-    points.forEach((point, index) => {
-      const scaled = scalePoint(point);
+      // Draw grid
+      ctx.strokeStyle = '#f3f4f6';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([2, 2]);
       
-      ctx.beginPath();
-      ctx.arc(scaled.x, scaled.y, 6, 0, 2 * Math.PI);
-      
-      // Color coding: start point green, others blue
-      if (index === 0) {
-        ctx.fillStyle = '#22c55e';
-      } else {
-        ctx.fillStyle = '#3b82f6';
+      // Vertical grid lines
+      for (let i = 0; i <= 10; i++) {
+        const x = (canvas.width / 10) * i;
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, canvas.height);
+        ctx.stroke();
       }
       
-      ctx.fill();
-      ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-    });
+      // Horizontal grid lines
+      for (let i = 0; i <= 10; i++) {
+        const y = (canvas.height / 10) * i;
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(canvas.width, y);
+        ctx.stroke();
+      }
 
-    // Draw grid
-    ctx.strokeStyle = '#f3f4f6';
-    ctx.lineWidth = 1;
-    ctx.setLineDash([2, 2]);
-    
-    // Vertical grid lines
-    for (let i = 0; i <= 10; i++) {
-      const x = (canvas.width / 10) * i;
-      ctx.beginPath();
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x, canvas.height);
-      ctx.stroke();
+      // Draw axis labels
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#6b7280';
+      ctx.font = '12px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText('X Coordinate', canvas.width / 2, canvas.height - 10);
+      
+      ctx.save();
+      ctx.translate(15, canvas.height / 2);
+      ctx.rotate(-Math.PI / 2);
+      ctx.fillText('Y Coordinate', 0, 0);
+      ctx.restore();
+      
+    } catch (error) {
+      console.error('Error rendering TSP visualization:', error);
     }
-    
-    // Horizontal grid lines
-    for (let i = 0; i <= 10; i++) {
-      const y = (canvas.height / 10) * i;
-      ctx.beginPath();
-      ctx.moveTo(0, y);
-      ctx.lineTo(canvas.width, y);
-      ctx.stroke();
-    }
-
-    // Draw axis labels
-    ctx.setLineDash([]);
-    ctx.fillStyle = '#6b7280';
-    ctx.font = '12px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText('X Coordinate', canvas.width / 2, canvas.height - 10);
-    
-    ctx.save();
-    ctx.translate(15, canvas.height / 2);
-    ctx.rotate(-Math.PI / 2);
-    ctx.fillText('Y Coordinate', 0, 0);
-    ctx.restore();
 
   }, [solution, showRoute, dimensions]);
 
@@ -190,7 +198,7 @@ const TSPVisualization: React.FC<TSPVisualizationProps> = ({
     <div className={`bg-white rounded-lg border shadow-sm ${className}`}>
       <div className="p-4 border-b">
         <h3 className="text-lg font-semibold text-gray-800">
-          TSP Visualization ({solution.pointCount} points)
+          Route Visualization ({solution.pointCount} points)
         </h3>
         {solution.route && (
           <div className="flex items-center gap-4 mt-2">

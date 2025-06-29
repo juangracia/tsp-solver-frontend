@@ -1,5 +1,6 @@
 {
-  "name": "frontend",
+  "name": "sf3-tps-solver-frontend",
+  "description": "SF3 TPS Solver - React frontend for the Travelling Salesman Problem solver",
   "private": true,
   "version": "0.0.0",
   "type": "module",
