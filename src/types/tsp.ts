@@ -12,6 +12,8 @@ export interface Coordinates {
 
 export interface RoutePoint extends Point {
   order: number;
+  segmentDistance?: number;
+  accumulatedDistance?: number;
 }
 
 export const SolutionStatus = {

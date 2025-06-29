@@ -112,16 +112,6 @@ const SolutionDetails: React.FC<SolutionDetailsProps> = ({
     return Math.sqrt(dx * dx + dy * dy);
   };
 
-  const getRouteDistances = (route: Array<{ x: number; y: number }>) => {
-    const distances = [];
-    for (let i = 0; i < route.length; i++) {
-      const current = route[i];
-      const next = route[(i + 1) % route.length];
-      distances.push(calculateDistance(current, next));
-    }
-    return distances;
-  };
-
   // If showOnlyTables is true, only render the tables
   if (showOnlyTables) {
     return (
@@ -193,29 +183,25 @@ const SolutionDetails: React.FC<SolutionDetailsProps> = ({
                         Coordinates
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-r border-gray-200">
-                        Segment Distance
+                        Distance to Next
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                        Total Distance
+                        Accumulated Distance
                       </th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-100">
-                    {(() => {
-                      const routeDistances = getRouteDistances(solution.route);
-                      let cumulativeDistance = 0;
-                      
-                      return solution.route.map((point, index) => {
-                        const distance = routeDistances[index];
-                        cumulativeDistance += distance;
+                    {solution.route.map((point, index) => {
+                      const distance = point.segmentDistance || 0;
+                      const accumulatedDistance = point.accumulatedDistance || 0;
                         
-                        // Find original index of this point
-                        const originalIndex = solution.originalPoints ? 
-                          solution.originalPoints.findIndex(op => 
-                            Math.abs(op.x - point.x) < 0.001 && Math.abs(op.y - point.y) < 0.001
-                          ) + 1 : 'N/A';
+                      // Find original index of this point
+                      const originalIndex = solution.originalPoints ? 
+                        solution.originalPoints.findIndex(op => 
+                          Math.abs(op.x - point.x) < 0.001 && Math.abs(op.y - point.y) < 0.001
+                        ) + 1 : 'N/A';
 
-                        return (
+                      return (
                           <tr 
                             key={index} 
                             className={`cursor-pointer transition-colors duration-150 hover:bg-green-50 ${
@@ -244,19 +230,26 @@ const SolutionDetails: React.FC<SolutionDetailsProps> = ({
                             </td>
                             <td className="px-4 py-3 text-sm font-medium text-blue-600 border-r border-gray-100">
                               <div>
-                                {formatDistance(distance)}
+                                <span className="font-semibold">{formatDistance(distance)}</span>
                                 {index === solution.route.length - 1 && (
-                                  <div className="text-xs text-gray-500 mt-1">Return to start</div>
+                                  <div className="text-xs text-gray-500 mt-1">→ Return to start</div>
+                                )}
+                                {index < solution.route.length - 1 && (
+                                  <div className="text-xs text-gray-500 mt-1">→ Point {index + 2}</div>
                                 )}
                               </div>
                             </td>
                             <td className="px-4 py-3 text-sm font-semibold text-green-600">
-                              {formatDistance(cumulativeDistance)}
+                              <div>
+                                <span className="text-lg">{formatDistance(accumulatedDistance)}</span>
+                                <div className="text-xs text-gray-500 mt-1">
+                                  {((accumulatedDistance / (solution.totalDistance || 1)) * 100).toFixed(1)}% complete
+                                </div>
+                              </div>
                             </td>
                           </tr>
                         );
-                      });
-                    })()}
+                      })}
                   </tbody>
                 </table>
               </div>
@@ -449,29 +442,25 @@ const SolutionDetails: React.FC<SolutionDetailsProps> = ({
                             Coordinates
                           </th>
                           <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-r border-gray-200">
-                            Segment Distance
+                            Distance to Next
                           </th>
                           <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            Total Distance
+                            Accumulated Distance
                           </th>
                         </tr>
                       </thead>
                       <tbody className="bg-white divide-y divide-gray-100">
-                        {(() => {
-                          const routeDistances = getRouteDistances(solution.route);
-                          let cumulativeDistance = 0;
-                          
-                          return solution.route.map((point, index) => {
-                            const distance = routeDistances[index];
-                            cumulativeDistance += distance;
+                        {solution.route.map((point, index) => {
+                          const distance = point.segmentDistance || 0;
+                          const accumulatedDistance = point.accumulatedDistance || 0;
                             
-                            // Find original index of this point
-                            const originalIndex = solution.originalPoints ? 
-                              solution.originalPoints.findIndex(op => 
-                                Math.abs(op.x - point.x) < 0.001 && Math.abs(op.y - point.y) < 0.001
-                              ) + 1 : 'N/A';
+                          // Find original index of this point
+                          const originalIndex = solution.originalPoints ? 
+                            solution.originalPoints.findIndex(op => 
+                              Math.abs(op.x - point.x) < 0.001 && Math.abs(op.y - point.y) < 0.001
+                            ) + 1 : 'N/A';
 
-                            return (
+                          return (
                               <tr 
                                 key={index} 
                                 className={`cursor-pointer transition-colors duration-150 hover:bg-green-50 ${
@@ -500,19 +489,26 @@ const SolutionDetails: React.FC<SolutionDetailsProps> = ({
                                 </td>
                                 <td className="px-4 py-3 text-sm font-medium text-blue-600 border-r border-gray-100">
                                   <div>
-                                    {formatDistance(distance)}
+                                    <span className="font-semibold">{formatDistance(distance)}</span>
                                     {index === solution.route.length - 1 && (
-                                      <div className="text-xs text-gray-500 mt-1">Return to start</div>
+                                      <div className="text-xs text-gray-500 mt-1">→ Return to start</div>
+                                    )}
+                                    {index < solution.route.length - 1 && (
+                                      <div className="text-xs text-gray-500 mt-1">→ Point {index + 2}</div>
                                     )}
                                   </div>
                                 </td>
                                 <td className="px-4 py-3 text-sm font-semibold text-green-600">
-                                  {formatDistance(cumulativeDistance)}
+                                  <div>
+                                    <span className="text-lg">{formatDistance(accumulatedDistance)}</span>
+                                    <div className="text-xs text-gray-500 mt-1">
+                                      {((accumulatedDistance / (solution.totalDistance || 1)) * 100).toFixed(1)}% complete
+                                    </div>
+                                  </div>
                                 </td>
                               </tr>
                             );
-                          });
-                        })()}
+                          })}
                       </tbody>
                     </table>
                   </div>

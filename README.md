@@ -5,10 +5,12 @@ A React TypeScript frontend for the Travelling Salesman Problem (TSP) solver app
 ## Features
 
 - **Interactive File Upload**: Drag & drop interface for coordinate files (.txt, .csv)
-- **2D Visualization**: Canvas-based rendering of points and optimal routes
+- **Advanced Visualization**: Modern SVG-based rendering with interactive point selection
+- **Dark Mode Support**: Toggle between light and dark themes with system preference detection  
 - **Algorithm Performance**: Real-time metrics and execution time tracking
 - **Solutions History**: Manage and compare multiple TSP solutions
 - **Responsive Design**: Mobile-friendly interface with Tailwind CSS
+- **Interactive Features**: Point highlighting, side-by-side route data, smooth animations
 - **Type Safety**: Full TypeScript implementation with strict type checking
 
 ## Technology Stack
@@ -18,7 +20,8 @@ A React TypeScript frontend for the Travelling Salesman Problem (TSP) solver app
 - **Tailwind CSS** for styling
 - **Axios** for API communication
 - **React Dropzone** for file uploads
-- **Canvas API** for route visualization
+- **SVG Rendering** for modern interactive visualization
+- **Canvas API** for legacy visualization support
 
 ## Getting Started
 
@@ -73,10 +76,16 @@ The backend automatically selects algorithms based on problem size:
 
 ### Visualization
 
-- **Points**: Green for start point, blue for other points
-- **Routes**: Red lines showing the optimal path
-- **Interactive Controls**: Toggle route display, zoom/pan support
-- **Algorithm Info**: Performance metrics and execution time
+- **Modern SVG Interface**: Interactive SVG-based visualization with smooth animations
+- **Point Visualization**: Green for start point, blue for other points, with hover effects
+- **Route Display**: Red lines showing the optimal path with smooth transitions
+- **Interactive Features**: 
+  - Click to select and highlight points
+  - Side-by-side route data panel
+  - Toggle route display
+  - Responsive scaling and layout
+- **Dark Mode**: Full dark theme support with theme-aware colors
+- **Legacy Canvas**: Alternative canvas-based visualization for compatibility
 
 ## API Integration
 
@@ -93,10 +102,12 @@ The frontend communicates with the Spring Boot backend via REST API:
 ```
 src/
 ├── components/           # React components
-│   ├── FileUpload.tsx   # File upload with validation
-│   ├── TSPVisualization.tsx # Canvas-based route display
-│   ├── SolutionDetails.tsx  # Algorithm results and metrics
-│   └── SolutionsHistory.tsx # Solution management
+│   ├── FileUpload.tsx         # File upload with validation
+│   ├── TSPVisualization.tsx   # Legacy Canvas-based route display
+│   ├── TSPVisualizationSVG.tsx # Modern SVG visualization with interactions
+│   ├── ThemeToggle.tsx        # Dark/light mode toggle
+│   ├── SolutionDetails.tsx    # Algorithm results and metrics
+│   └── SolutionsHistory.tsx   # Solution management
 ├── services/            # API communication
 │   └── tspService.ts    # Backend integration service
 ├── types/              # TypeScript definitions
@@ -146,14 +157,17 @@ server: {
 
 1. Start the backend server (port 8080)
 2. Start the frontend dev server (port 3000)
-3. Upload test files from `/tsp-solver-backend/postman_test_files/`
+3. Upload test files from `/tsp-solver-backend/txt/` (organized by algorithm type)
 4. Verify algorithm selection and visualization
 
 ### Test Files
 
 Sample coordinate files are available:
 - `/public/sample_points.txt` - 5 points for exact algorithm testing
-- Backend test files in `/tsp-solver-backend/postman_test_files/`
+- Backend test files in `/tsp-solver-backend/txt/`:
+  - `exact_*.txt` - Small datasets (≤10 points) for ExactTSPSolver
+  - `heuristic_*.txt` - Medium datasets (11-25 points) for HeuristicTSPSolver  
+  - `metaheuristic_*.txt` - Large datasets (26+ points) for MetaheuristicTSPSolver
 
 ## Performance
 
