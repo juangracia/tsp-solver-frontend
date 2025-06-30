@@ -110,7 +110,7 @@ function App() {
           </span>
           <h1 className="text-4xl font-extrabold tracking-tight drop-shadow-lg" style={{ color: 'var(--color-primary)' }}>SF3 TPS Solver</h1>
         </div>
-        <p className="text-lg font-semibold drop-shadow-sm" style={{ color: 'var(--color-secondary)' }}>Smart, interactive visualization for the Travelling Salesman Problem</p>
+        <p className="text-lg font-semibold drop-shadow-sm" style={{ color: 'var(--color-secondary)' }}>Smart, interactive route optimization and visualization</p>
       </header>
 
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 pb-12 animate-fade-in">
