@@ -125,9 +125,6 @@ const SolutionDetails: React.FC<SolutionDetailsProps> = ({
                       <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-r border-gray-200">
                         Coordinates
                       </th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                        Address
-                      </th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-100">
@@ -145,9 +142,6 @@ const SolutionDetails: React.FC<SolutionDetailsProps> = ({
                         </td>
                         <td className="px-4 py-3 text-sm text-gray-700 font-mono border-r border-gray-100">
                           ({point.x.toFixed(2)}, {point.y.toFixed(2)})
-                        </td>
-                        <td className="px-4 py-3 text-sm text-gray-700 max-w-xs truncate">
-                          {point.address || 'N/A'}
                         </td>
                       </tr>
                     ))}
@@ -214,13 +208,7 @@ const SolutionDetails: React.FC<SolutionDetailsProps> = ({
                               </div>
                             </td>
                             <td className="px-4 py-3 text-sm text-gray-700 font-mono border-r border-gray-100">
-                              {point.address ? (
-                                <div className="max-w-xs truncate" title={point.address}>
-                                  {point.address.split(',')[0]}
-                                </div>
-                              ) : (
-                                `(${point.x.toFixed(2)}, ${point.y.toFixed(2)})`
-                              )}
+                              ({point.x.toFixed(2)}, {point.y.toFixed(2)})
                             </td>
                             <td className="px-4 py-3 text-sm font-medium text-blue-600 border-r border-gray-100">
                               <div>
@@ -282,11 +270,6 @@ const SolutionDetails: React.FC<SolutionDetailsProps> = ({
                   <div className="text-2xl font-bold text-green-600">
                     {formatDistance(solution.totalDistance)}
                   </div>
-                  {solution.realWorldDistance && (
-                    <div className="text-sm text-gray-500 mt-1">
-                      Real-world: {solution.realWorldDistance}
-                    </div>
-                  )}
                 </div>
               )}
             </div>
@@ -315,14 +298,6 @@ const SolutionDetails: React.FC<SolutionDetailsProps> = ({
                 </div>
               )}
 
-              {solution.estimatedDriveTime && (
-                <div className="text-center p-3 bg-gray-50 rounded-lg">
-                  <div className="text-sm text-gray-600 mb-1">Drive Time</div>
-                  <div className="font-semibold text-gray-800">
-                    {solution.estimatedDriveTime}
-                  </div>
-                </div>
-              )}
 
               {solution.createdAt && (
                 <div className="text-center p-3 bg-gray-50 rounded-lg">
@@ -353,16 +328,6 @@ const SolutionDetails: React.FC<SolutionDetailsProps> = ({
                 </button>
               )}
 
-              {solution.mapUrl && (
-                <a
-                  href={solution.mapUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-center"
-                >
-                  View in Google Maps
-                </a>
-              )}
             </div>
           </div>
         )}
@@ -384,9 +349,6 @@ const SolutionDetails: React.FC<SolutionDetailsProps> = ({
                           <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-r border-gray-200">
                             Coordinates
                           </th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            Address
-                          </th>
                         </tr>
                       </thead>
                       <tbody className="bg-white divide-y divide-gray-100">
@@ -404,9 +366,6 @@ const SolutionDetails: React.FC<SolutionDetailsProps> = ({
                             </td>
                             <td className="px-4 py-3 text-sm text-gray-700 font-mono border-r border-gray-100">
                               ({point.x.toFixed(2)}, {point.y.toFixed(2)})
-                            </td>
-                            <td className="px-4 py-3 text-sm text-gray-700 max-w-xs truncate">
-                              {point.address || 'N/A'}
                             </td>
                           </tr>
                         ))}
@@ -473,13 +432,7 @@ const SolutionDetails: React.FC<SolutionDetailsProps> = ({
                                   </div>
                                 </td>
                                 <td className="px-4 py-3 text-sm text-gray-700 font-mono border-r border-gray-100">
-                                  {point.address ? (
-                                    <div className="max-w-xs truncate" title={point.address}>
-                                      {point.address.split(',')[0]}
-                                    </div>
-                                  ) : (
-                                    `(${point.x.toFixed(2)}, ${point.y.toFixed(2)})`
-                                  )}
+                                  ({point.x.toFixed(2)}, {point.y.toFixed(2)})
                                 </td>
                                 <td className="px-4 py-3 text-sm font-medium text-blue-600 border-r border-gray-100">
                                   <div>

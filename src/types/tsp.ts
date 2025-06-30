@@ -1,14 +1,8 @@
 export interface Point {
   x: number;
   y: number;
-  address?: string;
-  coordinates?: Coordinates;
 }
 
-export interface Coordinates {
-  lat: number;
-  lng: number;
-}
 
 export interface RoutePoint extends Point {
   order: number;
@@ -33,27 +27,16 @@ export interface TSPSolution {
   status: SolutionStatus;
   algorithm?: string;
   totalDistance?: number;
-  realWorldDistance?: string;
-  estimatedDriveTime?: string;
   executionTimeMs?: number;
   route?: RoutePoint[];
   originalPoints: Point[];
-  realWorldDemo?: boolean;
-  mapUrl?: string;
   createdAt?: string;
-  addresses?: AddressInfo[];
 }
 
-export interface AddressInfo {
-  address: string;
-  coordinates: Coordinates;
-  placeId?: string;
-}
 
 export interface SolveOptions {
   algorithm?: string;
   maxTime?: number;
-  useRealDistances?: boolean;
 }
 
 export interface UploadResponse {
@@ -61,8 +44,6 @@ export interface UploadResponse {
   pointCount: number;
   status: SolutionStatus;
   fileName?: string;
-  addresses?: AddressInfo[];
-  realWorldDemo?: boolean;
 }
 
 export interface SolutionsListResponse {

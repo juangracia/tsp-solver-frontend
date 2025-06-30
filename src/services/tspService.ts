@@ -26,14 +26,6 @@ export class TSPService {
     return response.data;
   }
 
-  static async uploadAddresses(addresses: string[], mode: string = 'DEMO'): Promise<UploadResponse> {
-    const response: AxiosResponse<UploadResponse> = await api.post('/upload-addresses', {
-      addresses,
-      mode,
-    });
-    
-    return response.data;
-  }
 
   static async solveTSP(id: string, options?: SolveOptions): Promise<TSPSolution> {
     const params = new URLSearchParams();
@@ -43,9 +35,6 @@ export class TSPService {
     }
     if (options?.maxTime) {
       params.append('maxTime', options.maxTime.toString());
-    }
-    if (options?.useRealDistances) {
-      params.append('useRealDistances', options.useRealDistances.toString());
     }
 
     const response: AxiosResponse<TSPSolution> = await api.post(`/${id}/solve?${params.toString()}`);
