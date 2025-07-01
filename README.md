@@ -197,13 +197,6 @@ Sample coordinate files are available:
 - **CORS Errors**: Use the Vite proxy configuration (already configured)
 - **Hot Reload**: Restart dev server if changes aren't reflected
 - **Build Failures**: Check TypeScript errors and dependencies
-
-## Contributing
-
-1. Follow TypeScript strict mode guidelines
-2. Use Tailwind CSS classes for styling
-3. Maintain component separation of concerns
-4. Add proper error handling for API calls
 5. Test with various file sizes and formats
 
 ## License
